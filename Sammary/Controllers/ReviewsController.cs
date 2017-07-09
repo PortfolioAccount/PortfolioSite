@@ -16,8 +16,8 @@ namespace Sammary.Controllers
 
         static List<Reviews> data = new List<Reviews>
         {
-            new Reviews { Id = Guid.NewGuid().ToString(), Name="Вадим", Review="Это текст отзыва", Date = "7/5/2017 3:57:01" },
-            new Reviews { Id = Guid.NewGuid().ToString(), Name="Амаяк", Review="Это текст отзыва", Date = "7/5/2017 3:57:01" },
+            new Reviews { Id = Guid.NewGuid().ToString(), Name="Вадим", ReviewText="Это текст отзыва", Date = "7.5.2017 3:57:01" },
+            new Reviews { Id = Guid.NewGuid().ToString(), Name="Амаяк", ReviewText="Это текст отзыва", Date = "7.5.2017 3:57:01" },
         };
 
         public ActionResult GetReviews()
@@ -26,23 +26,29 @@ namespace Sammary.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddPhone(Reviews phone)
+        public ActionResult AddReview(Reviews review)
         {
-            phone.Id = Guid.NewGuid().ToString();
-            data.Add(phone);
-            return Json(phone);
+            DateTime todayDate = DateTime.Now;
+            review.Id = Guid.NewGuid().ToString();
+            review.Date = todayDate.ToString();
+            data.Add(review);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        [HttpDelete]
-        public ActionResult DeletePhone(string id)
+        
+        public ActionResult DeleteReview(string id)
         {
-            Reviews phone = data.FirstOrDefault(x => x.Id == id);
-            if (phone != null)
+            string ID = id;
+            foreach (var delldate in data)
             {
-                data.Remove(phone);
-                return Json(phone);
+                if (delldate.Id == id)
+                {
+                    data.Remove(delldate);
+                    break;
+                }
             }
-            return HttpNotFound();
+                return Json(data, JsonRequestBehavior.AllowGet);
+           
         }
     }
 }

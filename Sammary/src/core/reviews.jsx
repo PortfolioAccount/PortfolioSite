@@ -1,11 +1,11 @@
 ﻿import React from 'react';
 
 
-class Phone extends React.Component{
+class Review extends React.Component{
 
     constructor(props){
         super(props);
-        this.state = {data: props.phone};
+        this.state = {data: props.review};
         this.onClick = this.onClick.bind(this);
     }
     onClick(e){
@@ -13,16 +13,16 @@ class Phone extends React.Component{
     }
     render(){
         return <div className="box">
+                <button className="delete-note" onClick={this.onClick}>Х</button>
                 <p><b>{this.state.data.Name}:  </b>
-                 {this.state.data.Date}
-                 <button className="delete-note" onClick={this.onClick}>X</button></p>
-                <p> {this.state.data.Review}</p>
+                 {this.state.data.Date} </p>
+                <p> {this.state.data.ReviewText}</p>
                 
         </div>;
     }
 }
 
-class PhoneForm extends React.Component{
+class ReviewForm extends React.Component{
 
     constructor(props){
         super(props);
@@ -40,12 +40,12 @@ class PhoneForm extends React.Component{
     }
     onSubmit(e) {
         e.preventDefault();
-        var phoneName = this.state.name.trim();
-        var phoneReview = this.state.review.trim();
-        if (!phoneName || !phoneReview) {
+        var reviewName = this.state.name.trim();
+        var reviewReview = this.state.review.trim();
+        if (!reviewName || !reviewReview) {
             return;
         }
-        this.props.onPhoneSubmit({ name: phoneName, review: phoneReview});
+        this.props.onReviewSubmit({ name: reviewName, review: reviewReview});
         this.setState({name: "",review:""});
     }
     render() {
@@ -70,22 +70,22 @@ class PhoneForm extends React.Component{
               }
 }
 
-export default class PhonesList extends React.Component{
+export default class ReviewsList extends React.Component{
 
     constructor(props){
         super(props);
-        this.state = { phones: [] };
+        this.state = { reviews: [] };
 
-        this.onAddPhone = this.onAddPhone.bind(this);
-        this.onRemovePhone = this.onRemovePhone.bind(this);
+        this.onAddReview= this.onAddReview.bind(this);
+        this.onRemoveReview = this.onRemoveReview.bind(this);
     }
     // загрузка данных
     loadData() {
         var xhr = new XMLHttpRequest();
-        xhr.open("get", "/Reviews/GetReviews", true);
+        xhr.open("Get", "/Reviews/GetReviews", true);
         xhr.onload = function () {
             var data = JSON.parse(xhr.responseText);
-            this.setState({ phones: data });
+            this.setState({ reviews: data });
         }.bind(this);
         xhr.send();
     }
@@ -93,18 +93,14 @@ export default class PhonesList extends React.Component{
         this.loadData();
     }
     // добавление объекта
-    onAddPhone(phone) {
-        if (phone) {
+    onAddReview(review) {
+        if (review) {
 
             var data = new FormData();
-            var day = new Date();
-            var dayFormat = day.toLocaleString()
-            var newDayFormat = dayFormat.replace(/[A-Z]|[,]/g, "");
-            data.append("name", phone.name);
-            data.append("review", phone.review);
-            data.append("date", newDayFormat);
+            data.append("name", review.name);
+            data.append("reviewtext", review.review);
             var xhr = new XMLHttpRequest();
-            xhr.open("post", "/Reviews/AddPhone", true);
+            xhr.open("Post", "/Reviews/AddReview", true);
             xhr.onload = function () {
                 if (xhr.status == 200) {
                     this.loadData();
@@ -112,16 +108,16 @@ export default class PhonesList extends React.Component{
             }.bind(this);
             xhr.send(data);
         }
+       
     }
     // удаление объекта
-    onRemovePhone(phone) {
+    onRemoveReview(review) {
 
-        if (phone) {
+        if (review) {
             var data = new FormData();
-            data.append("id", phone.Id);
-
+            data.append("id", review.Id);
             var xhr = new XMLHttpRequest();
-            xhr.open("delete", "/Reviews/DeletePhone", true);
+            xhr.open("Post", "/Reviews/DeleteReview", true);
             xhr.onload = function () {
                 if (xhr.status == 200) {
                     this.loadData();
@@ -135,16 +131,16 @@ export default class PhonesList extends React.Component{
 
     render(){
 
-        var remove = this.onRemovePhone;
+        var remove = this.onRemoveReview;
         return <div>
-                <PhoneForm onPhoneSubmit={this.onAddPhone} />
+                <ReviewForm onReviewSubmit={this.onAddReview} />
                 <hr />
                 
                 <div className="box-out" >
                     {
-                        this.state.phones.map(function(phone){
+                        this.state.reviews.map(function(review){
 
-                            return <Phone key={phone.Id} phone={phone} onRemove={remove} />
+                            return <Review key={review.Id} review={review} onRemove={remove} />
                             })
                     }
                 </div>
